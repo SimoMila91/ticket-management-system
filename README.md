@@ -234,7 +234,6 @@ Roles are cumulative. "Board member" applies to Employees, who only act on the b
 - Retention and anonymization of data of deactivated members.
 - Single sign-on (SSO/OAuth) login.
 - Desktop client (Electron) and mobile client (React Native).
-- Offline check-in with later synchronization on desktop and mobile.
 
 ## 10. Open Questions
 
