@@ -1,6 +1,6 @@
 ﻿namespace TicketApp.Domain;
 
-public class Class1
+public class Ticket
 {
 
 }
