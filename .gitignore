@@ -5,6 +5,8 @@
 
 # Dependencies
 node_modules/
+bin/
+obj/
 
 # Build outputs
 dist/
@@ -13,3 +15,5 @@ build/
 # IDE
 .vscode/
 .idea/
+
+
