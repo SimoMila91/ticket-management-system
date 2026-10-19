@@ -5,4 +5,7 @@
     <Project Path="src/TicketApp.Domain/TicketApp.Domain.csproj" />
     <Project Path="src/TicketApp.Infrastructure/TicketApp.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/TicketApp.Domain.Tests/TicketApp.Domain.Tests.csproj" />
+  </Folder>
 </Solution>
