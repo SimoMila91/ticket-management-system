@@ -1,0 +1,45 @@
+@baseUrl = http://localhost:5230
+
+### 1. Valid registration
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "Mario",
+  "surname": "Rossi",
+  "email": "Mario@Example.com",
+  "password": "password123"
+}
+
+### 2. same email: error
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "Mario",
+  "surname": "Rossi",
+  "email": "mario@example.com",
+  "password": "password123"
+}
+
+### 3. short password - 400 
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "Luigi",
+  "surname": "Verdi",
+  "email": "luigi@example.com",
+  "password": "abc"
+}
+
+### 4. empty name - 400
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "",
+  "surname": "Verdi",
+  "email": "luigi@example.com",
+  "password": "password123"
+}
