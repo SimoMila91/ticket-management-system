@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using TicketApp.Api.Contracts;
-using TicketApp.Domain;
+using TicketApp.Application.Abstractions;
+using TicketApp.Application.Accounts;
 using TicketApp.Infrastructure.Persistence;
 
 // This creates the builder. 
@@ -12,6 +13,10 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
+
+builder.Services.AddSingleton<IPasswordHasher, TicketApp.Infrastructure.Security.BcryptPasswordHasher>();
+builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+builder.Services.AddScoped<RegisterAccountHandler>();
 
 var app = builder.Build();
 
@@ -27,37 +32,18 @@ app.MapGet("/health", () => "OK champion").WithName("GetHealth");
 
 // --- POST --- // 
 
-app.MapPost("/auth/register", async (RegisterRequest request, AppDbContext dbContext, CancellationToken ct) =>
+
+app.MapPost("/auth/register", async (RegisterRequest request, RegisterAccountHandler handler, CancellationToken ct) =>
 {
-    if (request.Password.Length < 8)
-    {
-        return Results.BadRequest("The password is shorter than 8 characters");
-    }
-
-    var hash = BCrypt.Net.BCrypt.HashPassword(request.Password, 12);
-
-    Account account;
-
     try
     {
-        account = new Account(request.Name, request.Surname, request.Email, request.Password);
+        var id = await handler.HandleAsync(
+            new RegisterAccountCommand(request.Name, request.Surname, request.Email, request.Password), ct);
 
+        return Results.Created($"/accounts/{id}", new { id });
     }
-    catch (ArgumentException ex)
-    {
-        return Results.BadRequest(ex.Message);
-    }
-
-    // check if the account already exists 
-    var emailTaken = await dbContext.Accounts.AnyAsync(a => a.Email == account.Email, ct);
-    if (emailTaken)
-        return Results.Conflict("This email is already registered");
-
-    // save account 
-    dbContext.Accounts.Add(account);
-    await dbContext.SaveChangesAsync(ct);
-
-    return Results.Created($"/accounts/{account.Id}", new { account.Id });
+    catch (EmailAlreadyRegisteredException ex) { return Results.Conflict(ex.Message); }
+    catch (ArgumentException ex) { return Results.BadRequest(ex.Message); }
 });
 
 app.Run();
